@@ -9,10 +9,14 @@ import { createClient} from "redis"
 
 const app = express();
 
-const publisher = createClient();
+const publisher = createClient({
+    url: `redis://${process.env.REDIS_HOST || 'redis'}:6379`
+});
 publisher.connect();
 
-const subscriber = createClient();
+const subscriber = createClient({
+    url: `redis://${process.env.REDIS_HOST || 'redis'}:6379`
+});
 subscriber.connect();
 
 app.use(cors())

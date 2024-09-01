@@ -4,15 +4,19 @@ import { buildProject } from "./utils";
 import path from "path";
 import { uploadFile } from "./aws";
 
-const subcriber = createClient();
-subcriber.connect();
+const subscriber = createClient({
+  url: `redis://${process.env.REDIS_HOST || 'redis'}:6379`
+});
+subscriber.connect();
 
-const publisher = createClient();
+const publisher = createClient({
+  url: `redis://${process.env.REDIS_HOST || 'redis'}:6379`
+});
 publisher.connect();
 
 async function main(){
     while(1){
-      const res:any = await subcriber.brPop(
+      const res:any = await subscriber.brPop(
         commandOptions({ isolated: true}),
         "build-queue",
         0

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  upload-service:
+    image: upload-service:1.0
+    ports:
+      - "3000:3000"
+    environment:
+      - CF_ACCESS_KEY_ID=28cc04cc25ebf7a76e0000811f95e8b4
+      - CF_SECRET_ACCESS_KEY=e91032aa213842333833351700bba1c30e490af87605dc97af78d7e889415929
+      - CF_ENDPOINT=https://4d1ec783bad1c616696abe541ec3e06c.r2.cloudflarestorage.com
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+
+  deploy-service:
+    image: deploy-service:1.0
+    environment:
+      - CF_ACCESS_KEY_ID=28cc04cc25ebf7a76e0000811f95e8b4
+      - CF_SECRET_ACCESS_KEY=e91032aa213842333833351700bba1c30e490af87605dc97af78d7e889415929
+      - CF_ENDPOINT=https://4d1ec783bad1c616696abe541ec3e06c.r2.cloudflarestorage.com
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+      - upload-service
+
+  request-service:
+    image: request-service:1.0
+    ports:
+      - "3001:3001"  # Exposes port 3001 of the container as port 3001 on the host
+    environment:
+      - CF_ACCESS_KEY_ID=28cc04cc25ebf7a76e0000811f95e8b4
+      - CF_SECRET_ACCESS_KEY=e91032aa213842333833351700bba1c30e490af87605dc97af78d7e889415929
+      - CF_ENDPOINT=https://4d1ec783bad1c616696abe541ec3e06c.r2.cloudflarestorage.com
+      - REDIS_HOST=redis
+    depends_on:
+      - upload-service
+      - deploy-service
+
+  frontend:
+    image: frontend:1.0
+    ports:
+      - "5173:5173"
+    depends_on:
+      - request-service
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

@@ -8,9 +8,9 @@ const app = express();
 dotenv.config();
 
 const s3 = new S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    endpoint: process.env.AWS_ENDPOINT
+    accessKeyId: process.env.CF_ACCESS_KEY_ID,
+    secretAccessKey: process.env.CF_SECRET_ACCESS_KEY,
+    endpoint: process.env.CF_ENDPOINT
 });
 
 
